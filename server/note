@@ -1,0 +1,14 @@
+Accessing a Postgres Prompt
+- sudo -u postgres psql
+exit the interactive Postgres
+- \q
+createdb
+- create trello-db
+check status
+- service postgresql status
+create db
+- CREATE DATABASE trellodb;
+list
+- \l
+connect to db
+- \c trellodb

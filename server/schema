@@ -1,0 +1,23 @@
+const trelloschema = 'DROP SCHEMA trelloschema CASCADE;'
+const createSchema = 'CREATE SCHEMA trelloschema;'
+
+const dropBoardTable= 'DROP TABLE trelloschema.boards;'
+-- Board table
+const craeteBoardTable = `CREATE TABLE trelloschema.boards (
+    board_id SERIAL PRIMARY KEY NOT NULL,
+    board_name VARCHAR(100) NOT NULL
+);`
+
+const dropListsTable = 'DROP TABLE trelloschema.lists;'
+-- List table
+const craeteListsTable = `CREATE TABLE trelloschema.lists (
+    list_id SERIAL PRIMARY KEY NOT NULL,
+    list_name VARCHAR(100) NOT NULL,
+    board_id INTEGER REFERENCES trelloschema.boards(board_id) ON DELETE CASCADE);`
+
+const dropCardsTable = 'DROP TABLE trelloschema.cards;'
+-- Card table
+const craeteCardsTable = `CREATE TABLE trelloschema.cards (
+    card_id SERIAL PRIMARY KEY NOT NULL,
+    card_name VARCHAR(100) NOT NULL,
+    list_id INTEGER REFERENCES trelloschema.lists(list_id) ON DELETE CASCADE);`
