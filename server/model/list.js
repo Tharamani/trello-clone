@@ -11,10 +11,10 @@ const getListByIdModel = async (id) => {
 };
 
 // get all lists with board id
-const getListsByBoardIdModel = async (boardId) => {
-  console.log("getListsByBoardIdModel : >>>>>>>>", boardId);
+const getListsByBoardIdModel = async (id) => {
+  console.log("getListsByBoardIdModel : >>>>>>>>", id);
   const getQuery = "SELECT * FROM trelloschema.lists WHERE board_id = $1;";
-  const values = [boardId];
+  const values = [id];
   const result = await client.query(getQuery, values);
   if (result.rows) return result.rows;
   throw new Error("Error retrieving lists");
@@ -30,12 +30,12 @@ const createListModel = async (listName, boardId) => {
   return result.rows[0];
 };
 
-const updateListModel = async (listName, listId) => {
-  console.log("updateListModel : >>>>>>>>", listName, listId);
+const updateListModel = async (title, id) => {
+  console.log("updateListModel : >>>>>>>>", title, id);
 
   const updateQuery =
     "UPDATE trelloschema.lists SET list_name = $1 WHERE list_id = $2 RETURNING *";
-  const values = [listName, listId];
+  const values = [title, id];
   const result = await client.query(updateQuery, values);
   if (result.rowCount !== 1) throw new Error("Error updating list");
   return result.rows[0];
@@ -56,7 +56,7 @@ const getListsModel = async () => {
   const getQuery = "SELECT * FROM trelloschema.lists ORDER BY list_id;";
   const result = await client.query(getQuery);
   if (result.rows) return result.rows;
-  throw new Error("Lists not found");
+  throw new Error("Error retrieving lists");
 };
 
 module.exports = {

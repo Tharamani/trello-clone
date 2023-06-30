@@ -7,15 +7,15 @@ const {
   updateListModel,
   deleteListModel,
 } = require("../model/list");
-const { isValidName } = require("../controller/board");
+const { isValid } = require("../controller/board");
 
 // Get all lists for a specific board
 const getListsByBoardId = async (req, res) => {
   try {
-    if (!(await getBoardByIdModel(req.params.boardId)))
+    if (!(await getBoardByIdModel(req.params.id)))
       throw new Error("Board not found");
 
-    const response = await getListsByBoardIdModel(req.params.boardId);
+    const response = await getListsByBoardIdModel(req.params.id);
     return res.json(response); // 200 status is default
   } catch (error) {
     if (error.message === "Board not found")
@@ -30,15 +30,13 @@ const getListsByBoardId = async (req, res) => {
 // Create a new list for a specific board
 const createList = async (req, res) => {
   try {
-    if (!(await getBoardByIdModel(req.params.boardId)))
+    // if (!(await getBoardByIdModel(req.params.boardId)))
+    if (!(await getBoardByIdModel(req.params.id)))
       throw new Error("Board not found");
 
-    if (!isValidName(req.body.listName)) throw new Error("Bad request");
+    if (!isValid(req.body.title)) throw new Error("Bad request");
 
-    const response = await createListModel(
-      req.body.listName,
-      req.params.boardId
-    );
+    const response = await createListModel(req.body.title, req.params.id);
 
     return res
       .status(201)
@@ -63,9 +61,9 @@ const updateList = async (req, res) => {
     if (!(await getListByIdModel(req.params.id)))
       throw new Error("List not found");
 
-    if (!isValidName(req.body.listName)) throw new Error("Bad request");
+    if (!isValid(req.body.title)) throw new Error("Bad request");
 
-    const response = await updateListModel(req.body.listName, req.params.id);
+    const response = await updateListModel(req.body.title, req.params.id);
     return res.status(201).json({
       message: "List updated successfully!",
       list: response,

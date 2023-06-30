@@ -8,15 +8,15 @@ const {
   getCardModel,
 } = require("../model/card");
 const { getListByIdModel } = require("../model/list");
-const { isValidName } = require("../controller/board");
+const { isValid } = require("../controller/board");
 
 // Get all card for a specific list
 const getCardsByListId = async (req, res) => {
   try {
-    if (!(await getListByIdModel(req.params.listId)))
+    if (!(await getListByIdModel(req.params.id)))
       throw new Error("List not found");
 
-    const response = await getCardsByListIdModel(req.params.listId);
+    const response = await getCardsByListIdModel(req.params.id);
     return res.json(response); // 200 status is default
   } catch (error) {
     if (error.message === "List not found")
@@ -31,20 +31,17 @@ const getCardsByListId = async (req, res) => {
 // Create a new card in a specific list
 const createCard = async (req, res) => {
   try {
-    if (!(await getListByIdModel(req.params.listId)))
+    if (!(await getListByIdModel(req.params.id)))
       throw new Error("List not found");
 
-    if (!isValidName(req.body.cardName)) throw new Error("Bad request");
+    if (!isValid(req.body.title)) throw new Error("Bad request");
 
-    const response = await createCardModel(
-      req.body.cardName,
-      req.params.listId
-    );
+    const response = await createCardModel(req.body.title, req.params.id);
     console.log("createCard controller response >>>>>>>>>>> ", response);
 
     return res.status(201).json({
       message: "Card created successfully!",
-      list: response,
+      card: response,
     });
   } catch (error) {
     console.log("Error creating card : ", error.message);
@@ -60,18 +57,19 @@ const createCard = async (req, res) => {
   }
 };
 
+//update card by cardid
 const updateCard = async (req, res) => {
   try {
     if (!(await getCardByCidModel(req.params.id)))
       throw new Error("Card not found");
 
-    if (!isValidName(req.body.cardName)) throw new Error("Bad request");
+    if (!isValid(req.body.title)) throw new Error("Bad request");
 
-    const response = await updateCartModel(req.body.cardName, req.params.id);
+    const response = await updateCartModel(req.body.title, req.params.id);
 
     return res.status(201).json({
       message: "Card updated successfully!",
-      list: response,
+      card: response,
     });
   } catch (error) {
     console.log("Error updating card  : ", error.message);
@@ -89,6 +87,7 @@ const updateCard = async (req, res) => {
   }
 };
 
+// delete card by cardid
 const deleteCard = async (req, res) => {
   try {
     if (!(await getCardByCidModel(req.params.id)))

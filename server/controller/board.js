@@ -28,9 +28,9 @@ const getBoardById = async (req, res) => {
   }
 };
 
-//Validate boardName
-const isValidName = (name) => {
-  if (!name || typeof name !== "string") {
+//Validate title
+const isValid = (title) => {
+  if (!title || typeof title !== "string") {
     return false;
   }
   return true;
@@ -38,11 +38,11 @@ const isValidName = (name) => {
 
 // Create Board
 const createBoard = async (req, res) => {
+  console.log("create board: ");
   try {
-    if (!isValidName(req.body.boardName)) throw new Error("Bad request");
-
-    const response = await createBoardModel(req.body.boardName);
-
+    if (!isValid(req.body.title)) throw new Error("Bad request");
+    const response = await createBoardModel(req.body.title);
+    console.log("createBoard response", response);
     return res.status(201).json({
       message: "Board created successfully!",
       board: response,
@@ -66,8 +66,8 @@ const updateBoard = async (req, res) => {
     if (!(await getBoardByIdModel(req.params.id)))
       throw new Error("Board not found");
 
-    if (!isValidName(req.body.boardName)) throw new Error("Bad request");
-    const response = await updateBoardModel(req.body.boardName, req.params.id);
+    if (!isValid(req.body.title)) throw new Error("Bad request");
+    const response = await updateBoardModel(req.body.title, req.params.id);
 
     return res.json({
       message: "Board updated successfully!",
@@ -115,5 +115,5 @@ module.exports = {
   updateBoard,
   deleteBoard,
   getBoardById,
-  isValidName,
+  isValid,
 };

@@ -9,9 +9,8 @@ const cardController = require("../controller/card");
 router.put("/:id", listController.updateList);
 router.delete("/:id", listController.deleteList);
 
-// get, create cards
-router.get("/:listId/cards", cardController.getCardsByListId);
-router.post("/:listId/cards", cardController.createCard);
-// router.put("/:listId/cards/:cardId", cardController.updateCard);
-// router.delete("/:listId/cards/:cardId", cardController.deleteCard);
+// get, create cards by list id
+router.get("/:id/cards", cardController.getCardsByListId);
+router.post("/:id/cards", cardController.createCard);
+
 module.exports = router;
