@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: center;
   padding: 70px;
-  border: 5px solid black;
+  /* border: 5px solid black; */
 }
 
 button {
@@ -14,13 +14,17 @@ button {
   padding-left: 230px;
 }
 
-.board-sidebar {
-  width: 450px;
-}
+/* .board-sidebar {
+  width: 600px;
+} */
 
 .lists-container {
   display: flex;
   flex-direction: row;
   justify-content: center;
   margin: 10px;
+  width: auto;
+}
+.add-list {
+  width: 400px;
 }

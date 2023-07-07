@@ -24,7 +24,7 @@ export const AddForm = ({ addItem, setToggle }) => {
             onChange={(e) => setTitle(e.target.value)}
           ></TextField>
           <Button
-            olor="primary"
+            color="primary"
             variant="contained"
             disabled={!title}
             type="submit"

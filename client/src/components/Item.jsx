@@ -4,8 +4,8 @@ import { TextField } from "@mui/material";
 export const Item = ({ item, setToggleBoardList, displayLists }) => {
   const [title, setTitle] = useState(item.board_name);
 
-  const handleClick = async (e) => {
-    console.log("handleClick : ", e.target.value);
+  const boardItemClick = async (e) => {
+    console.log("boardItemClick : ", e.target.value);
     setToggleBoardList(true);
     displayLists(item);
   };
@@ -19,7 +19,7 @@ export const Item = ({ item, setToggleBoardList, displayLists }) => {
           onChange={(e) => {
             setTitle(e.target.value);
           }}
-          onClick={handleClick}
+          onClick={boardItemClick}
         ></TextField>
       </div>
     </>
