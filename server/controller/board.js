@@ -1,10 +1,11 @@
+const { errorCodes, errors } = require("../../lib");
 const {
   getBoardsModel,
   createBoardModel,
   updateBoardModel,
   deleteBoardModel,
   getBoardByIdModel,
-} = require("../model/board");
+} = require("../model/board"); // import whole object
 
 // Get Board
 const getBoards = async (req, res) => {
@@ -100,6 +101,8 @@ const deleteBoard = async (req, res) => {
   } catch (error) {
     console.log("Error editBoard  : ", error.message);
 
+    // if (error.code === errors.BOARD_NOT_FOUND.code)
+    //   return res.status(404).json({ message: "Board not found" });
     if (error.message === "Board not found")
       return res.status(404).json({ message: "Board not found" });
     if (error.message === "Error deleting board")

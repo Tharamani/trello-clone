@@ -59,6 +59,21 @@ const getListsModel = async () => {
   throw new Error("Error retrieving lists");
 };
 
+const getCardsForEachListModel = async (id) => {
+  const getQuery = `SELECT trelloschema.lists.list_name, 
+  trelloschema.lists.list_id, trelloschema.cards.card_id, trelloschema.cards.card_name
+  FROM trelloschema.lists
+  INNER JOIN trelloschema.cards
+  ON trelloschema.lists.list_id = trelloschema.cards.list_id
+  WHERE trelloschema.lists.board_id = $1;`;
+  // console.log("getCardsForEachListModel : getQuery ", getQuery);
+  const values = [id];
+  const result = await client.query(getQuery, values);
+  console.log("getCardsForEachListModel : result ", result);
+  if (result.rows) return result.rows;
+  throw new Error("Error retrieving lists");
+};
+
 module.exports = {
   getListsModel,
   getListsByBoardIdModel,
@@ -66,4 +81,5 @@ module.exports = {
   createListModel,
   updateListModel,
   deleteListModel,
+  getCardsForEachListModel,
 };

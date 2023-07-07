@@ -31,6 +31,11 @@ const getCardsByListId = async (req, res) => {
 // Create a new card in a specific list
 const createCard = async (req, res) => {
   try {
+    console.log(
+      "createCard controller  >>>>>>>>>>> ",
+      req.body.title,
+      req.params.id
+    );
     if (!(await getListByIdModel(req.params.id)))
       throw new Error("List not found");
 

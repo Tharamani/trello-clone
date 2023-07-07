@@ -12,7 +12,8 @@ router.put("/:id", boardController.updateBoard); // update board
 router.delete("/:id", boardController.deleteBoard); // delete board
 
 // get and create list by board id
-router.get("/:id/lists", listController.getListsByBoardId);
+// router.get("/:id/lists", listController.getListsByBoardId);
+router.get("/:id/lists", listController.getCardsForEachList);
 router.post("/:id/lists", listController.createList);
 
 module.exports = router;

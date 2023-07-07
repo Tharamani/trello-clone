@@ -21,3 +21,10 @@ const craeteCardsTable = `CREATE TABLE trelloschema.cards (
     card_id SERIAL PRIMARY KEY NOT NULL,
     card_name VARCHAR(100) NOT NULL,
     list_id INTEGER REFERENCES trelloschema.lists(list_id) ON DELETE CASCADE);`
+
+const getAllCardsForList = 'SELECT trelloschema.lists.list_name, 
+trelloschema.lists.list_id, trelloschema.cards.card_id, trelloschema.cards.card_name
+FROM trelloschema.lists
+INNER JOIN trelloschema.cards
+ON trelloschema.lists.list_id = trelloschema.cards.list_id
+WHERE trelloschema.lists.board_id = 1;'
