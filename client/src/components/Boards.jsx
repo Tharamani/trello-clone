@@ -12,7 +12,6 @@ import {
 import "./Boards.css";
 import { AddForm } from "./AddForm";
 import AddIcon from "@mui/icons-material/Add";
-
 import { BoardLists } from "./BoardLists";
 
 export const Boards = () => {
@@ -47,20 +46,17 @@ export const Boards = () => {
       const data = await createCard(item, listId);
       // Destructure the data array
       setLists((prevLists) => {
-        const [lObject] = prevLists;
+        const updatedList = [...prevLists];
 
-        const updatedList = [{ ...lObject }];
-        console.log("created updatedList ", ...updatedList);
+        console.log("new List ", updatedList);
 
-        updatedList.map((element) => {
-          element[listId].cards.push(data.card);
-          return element;
+        updatedList.map((listElement) => {
+          const listKey = Object.keys(listElement);
+          if (Number(listKey) === listId)
+            return listElement[listId].cards.push(data.card);
         });
 
-        console.log(
-          "created updatedList after updatedLists........",
-          updatedList
-        );
+        console.log("created updatedList after forEach........", updatedList);
         return updatedList;
       });
     } catch (e) {
@@ -71,13 +67,37 @@ export const Boards = () => {
   const editCard = async (cardItem, listId) => {
     console.log("editCard boards: card ", cardItem, listId);
     try {
-      const data = await updateCard(cardItem, cardItem.card_id, listId);
+      const data = await updateCard(cardItem, cardItem.card_id);
 
       // Destructure and setLists data array
+      setLists((prevLists) => {
+        const updatedList = [...prevLists];
+        console.log("new List ", updatedList);
+
+        updatedList.map((listElement) => {
+          const listKey = Object.keys(listElement);
+          if (Number(listKey) === listId) {
+            const prevCardsArray = listElement[listId].cards;
+
+            prevCardsArray.map((card, index, array) => {
+              if (Number(card.card_id) === cardItem.card_id) {
+                const updatedCard = { ...card, card_name: data.card.card_name };
+                array[index] = updatedCard;
+                // return updatedCard;
+              } else {
+                // return card;
+              }
+            });
+          }
+        });
+        console.log("created updatedList after forEach........", updatedList);
+        return updatedList;
+      });
     } catch (e) {
       console.log("Error: editCard ", e.message);
     }
   };
+
   // item => list
   const createNewList = async (item) => {
     console.log("createNewList : item boardId", item, boardItem.board_id);
