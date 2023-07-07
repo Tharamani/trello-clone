@@ -63,7 +63,7 @@ const getCardsForEachListModel = async (id) => {
   const getQuery = `SELECT trelloschema.lists.list_name, 
   trelloschema.lists.list_id, trelloschema.cards.card_id, trelloschema.cards.card_name
   FROM trelloschema.lists
-  INNER JOIN trelloschema.cards
+  LEFT JOIN trelloschema.cards
   ON trelloschema.lists.list_id = trelloschema.cards.list_id
   WHERE trelloschema.lists.board_id = $1;`;
   // console.log("getCardsForEachListModel : getQuery ", getQuery);
