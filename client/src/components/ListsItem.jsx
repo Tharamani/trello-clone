@@ -10,7 +10,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import "./ListsItem.css";
 import { CardsCollection } from "./CardsCollection";
 
-export const ListsItem = ({ list, listId, createNewCard, editCard }) => {
+export const ListsItem = ({
+  list,
+  listId,
+  createNewCard,
+  editCard,
+  moveItem,
+}) => {
   // console.log("ListsItem list", { list });
 
   const [title, setTitle] = useState(list.list_name);
@@ -61,6 +67,7 @@ export const ListsItem = ({ list, listId, createNewCard, editCard }) => {
                   cards={list.cards}
                   editCard={editCard}
                   listId={listId}
+                  moveItem={moveItem}
                 />
               }
             </Typography>

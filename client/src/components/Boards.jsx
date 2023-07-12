@@ -1,6 +1,6 @@
 import { Collection } from "./Collection";
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useRef } from "react";
+import { useDrop } from "react-dnd";
 import {
   createBoard,
   getBoards,
@@ -13,13 +13,22 @@ import "./Boards.css";
 import { AddForm } from "./AddForm";
 import AddIcon from "@mui/icons-material/Add";
 import { BoardLists } from "./BoardLists";
+import * as Util from "./util.jsx";
 
 export const Boards = () => {
   const [boards, setBoards] = useState([]);
-  const [Lists, setLists] = useState([]);
+  const [lists, setLists] = useState([]);
   const [toggle, setToggle] = useState(false);
   const [toggleBoardList, setToggleBoardList] = useState(false);
   const [boardItem, setBoardItem] = useState({});
+
+  // const [{ isOver }, refDrop] = useDrop(() => ({
+  //   accept: "text",
+  //   drop: (item) => addTextToBoard(item.card_id, item.listId),
+  //   collect: (monitor) => ({
+  //     isOver: !!monitor.isOver(),
+  //   }),
+  // }));
 
   useEffect(() => {
     populateBoards();
@@ -39,64 +48,76 @@ export const Boards = () => {
     }
   };
 
-  // item => card
+  // Add new card for a list
   const createNewCard = async (item, listId) => {
     console.log("createNewCard : item list", item, listId);
     try {
       const data = await createCard(item, listId);
       // Destructure the data array
       setLists((prevLists) => {
-        const updatedList = [...prevLists];
-
-        console.log("new List ", updatedList);
-
-        updatedList.map((listElement) => {
-          const listKey = Object.keys(listElement);
-          if (Number(listKey) === listId)
-            return listElement[listId].cards.push(data.card);
-        });
-
-        console.log("created updatedList after forEach........", updatedList);
-        return updatedList;
+        const copyList = [...prevLists];
+        return Util.createCardUpdateList(copyList, listId, data);
       });
     } catch (e) {
       console.log("Error: createNewCard ", e.message);
     }
   };
 
+  // Edit card for a list
   const editCard = async (cardItem, listId) => {
     console.log("editCard boards: card ", cardItem, listId);
     try {
-      const data = await updateCard(cardItem, cardItem.card_id);
-
-      // Destructure and setLists data array
+      const data = await updateCard(cardItem);
+      // Destructure and update
       setLists((prevLists) => {
-        const updatedList = [...prevLists];
-        console.log("new List ", updatedList);
+        const prevItems = [...prevLists];
 
-        updatedList.map((listElement) => {
-          const listKey = Object.keys(listElement);
-          if (Number(listKey) === listId) {
-            const prevCardsArray = listElement[listId].cards;
-
-            prevCardsArray.map((card, index, array) => {
-              if (Number(card.card_id) === cardItem.card_id) {
-                const updatedCard = { ...card, card_name: data.card.card_name };
-                array[index] = updatedCard;
-                // return updatedCard;
-              } else {
-                // return card;
-              }
-            });
-          }
-        });
-        console.log("created updatedList after forEach........", updatedList);
-        return updatedList;
+        // Util.editCardUpdateCardList(prevItems, listId, cardItem, "DND updated");
+        return Util.editCardUpdateCardList(prevItems, data, listId, cardItem);
       });
     } catch (e) {
       console.log("Error: editCard ", e.message);
     }
   };
+
+  // Move card within a list
+  const moveItem = (dragIndex, hoverIndex, item) => {
+    console.log(
+      "Boards moveItem : dragIndex, hoverIndex",
+      dragIndex,
+      hoverIndex,
+      item,
+      item.list_id
+    );
+
+    setLists((prevState) => {
+      const prevItems = [...prevState];
+      return Util.moveCardsInList(prevItems, item, dragIndex, hoverIndex);
+    });
+  };
+
+  // const addTextToBoard = (card_id, listId) => {
+  //   console.log("addTextToBoard card card_id : ", listId, card_id);
+  //   setLists((prevLists) => {
+  //     const updatedList = [...prevLists];
+  //     const newUpdated = updatedList.map((listElement) => {
+  //       if (listElement.list_id === listId) {
+  //         // list item
+  //         // const prevCardsArray = listElement.cards;
+  //         const mCards = listElement.cards.map((card, index) => {
+  //           if (card.card_id === card_id) {
+  //             return { ...card, card_name: card.card_name };
+  //           }
+  //           return card;
+  //         });
+  //         return { ...listElement, cards: [...mCards] };
+  //       }
+  //       return listElement;
+  //     });
+  //     console.log("created newUpdated after........", newUpdated);
+  //     return newUpdated;
+  //   });
+  // };
 
   // item => list
   const createNewList = async (item) => {
@@ -150,10 +171,11 @@ export const Boards = () => {
         <div>
           {toggleBoardList && (
             <BoardLists
-              Lists={Lists}
+              Lists={lists}
               createNewCard={createNewCard}
               createNewList={createNewList}
               editCard={editCard}
+              moveItem={moveItem}
             />
           )}
         </div>

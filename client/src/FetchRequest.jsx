@@ -117,10 +117,10 @@ export const createList = async (item, id) => {
 };
 
 // Create Board
-export const updateCard = async (item, id) => {
-  console.log("fetchRequest... updateCard", item, id);
+export const updateCard = async (item) => {
+  console.log("fetchRequest... updateCard", item);
   if (item.title) {
-    const response = await fetch(`${url}/cards/${id}`, {
+    const response = await fetch(`${url}/cards/${item.card_id}`, {
       // using list id create cards
       // api call
       method: "PUT",

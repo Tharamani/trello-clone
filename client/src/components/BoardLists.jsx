@@ -15,6 +15,7 @@ export const BoardLists = ({
   createNewCard,
   createNewList,
   editCard,
+  moveItem,
 }) => {
   console.log("BoardLists Lists", Lists);
 
@@ -41,16 +42,16 @@ export const BoardLists = ({
         <h1>Lists</h1>
         {Lists.map((item) => {
           {
-            console.log(" item key : ", Number(Object.keys(item)));
-            console.log(" item value : ", item[Object.keys(item)]);
+            console.log(" item key : ", item.list_id);
           }
           return (
             <ListsItem
-              key={Number(Object.keys(item))}
-              list={item[Object.keys(item)]}
-              listId={Number(Object.keys(item))}
+              key={item.list_id}
+              list={item}
+              listId={item.list_id}
               createNewCard={createNewCard}
               editCard={editCard}
+              moveItem={moveItem}
             />
           );
         })}
