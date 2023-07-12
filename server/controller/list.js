@@ -133,7 +133,7 @@ const getLists = async (req, res) => {
   }
 };
 
-const getCardsForEachList = async (req, res) => {
+const getCardsForEachListalt = async (req, res) => {
   try {
     const response = await getCardsForEachListModel(req.params.id);
     console.log("getCardsForEachList  : response", response);
@@ -189,6 +189,61 @@ const getCardsForEachList = async (req, res) => {
 
     console.log("getCardsForEachList  : response", listArray);
     return res.json(listArray); // 200 status is default
+  } catch (error) {
+    if (error.message === "Error retrieving list")
+      return res.status(404).json({ message: "Error retrieving list" });
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getCardsForEachList = async (req, res) => {
+  try {
+    const response = await getCardsForEachListModel(req.params.id);
+    console.log("getCardsForEachList  : response >>>>>>>>>>. ", response);
+
+    const set = new Set();
+    let result = response.reduce((lists, list) => {
+      let card = { card_id: list.card_id, card_name: list.card_name };
+      const key = `${list.list_id}${list.list_name}`;
+      if (!set.has(key)) {
+        lists.push({
+          list_id: list.list_id,
+          list_name: list.list_name,
+          cards: list.card_id ? [card] : [],
+        });
+      } else {
+        lists[lists.length - 1].cards.push(card);
+        // console.log("key : listLen", lists.length, listLen);
+      }
+      set.add(key);
+      return lists;
+    }, []);
+
+    // console.log("result", result);
+
+    // const set = new Set();
+    // const listsSet = response.reduce((lists, list) => {
+    //   let card = { card_id: list.card_id, card_name: list.card_name };
+    //   const key = `${list.list_id}${list.list_name}`;
+    //   // console.log("getCardsForEachList  : key", key);
+    //   // unique list ids
+
+    //   if (!set.has(key)) {
+    //     lists.push({
+    //       list_id: list.list_id,
+    //       list_name: list.list_name,
+    //       cards: list.card_id ? [card] : [],
+    //     });
+    //   } else {
+    //     lists[0].cards.push(card);
+    //   }
+    //   // console.log("getCardsForEachList  : key ", key);
+    //   set.add(key);
+
+    //   return lists;
+    // }, []);
+    console.log("getCardsForEachList  : result", result);
+    return res.json(result); // 200 status is default
   } catch (error) {
     if (error.message === "Error retrieving list")
       return res.status(404).json({ message: "Error retrieving list" });

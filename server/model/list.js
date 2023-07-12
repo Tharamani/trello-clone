@@ -69,7 +69,7 @@ const getCardsForEachListModel = async (id) => {
   // console.log("getCardsForEachListModel : getQuery ", getQuery);
   const values = [id];
   const result = await client.query(getQuery, values);
-  console.log("getCardsForEachListModel : result ", result);
+  // console.log("getCardsForEachListModel : result ", result);
   if (result.rows) return result.rows;
   throw new Error("Error retrieving lists");
 };
