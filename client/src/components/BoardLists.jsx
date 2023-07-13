@@ -15,7 +15,7 @@ export const BoardLists = ({
   createNewCard,
   createNewList,
   editCard,
-  moveItem,
+  moveCard,
 }) => {
   console.log("BoardLists Lists", Lists);
 
@@ -51,7 +51,7 @@ export const BoardLists = ({
               listId={item.list_id}
               createNewCard={createNewCard}
               editCard={editCard}
-              moveItem={moveItem}
+              moveCard={moveCard}
             />
           );
         })}

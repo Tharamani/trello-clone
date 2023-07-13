@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { useDrag, useDrop } from "react-dnd";
 
-export const CardsItem = ({ cItem, editCard, listId, moveItem, index }) => {
+export const CardsItemAL = ({ cItem, editCard, listId, index, moveCard }) => {
   // console.log("CardsItem", item);
 
   const [title, setTitle] = useState(() => {
@@ -23,75 +23,52 @@ export const CardsItem = ({ cItem, editCard, listId, moveItem, index }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const ref = useRef(null);
-  const [, drop] = useDrop({
-    accept: "text",
-    hover(item, monitor) {
-      if (!ref.current) return;
-      const dragIndex = item.index;
-      const hoverIndex = index;
-      if (dragIndex === hoverIndex) return;
-
-      // const hoverRect = ref.current.getBoundingClientRect();
-      // const hoverMiddleY = (hoverRect.bottom - hoverRect.top) / 2;
-      // const mousePosition = monitor.getClientOffset();
-      // const hoverClientY = mousePosition.y - hoverRect.top;
-
-      // if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
-      // if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
-      moveItem(dragIndex, hoverIndex, item);
-      item.index = hoverIndex;
-    },
-  });
-  const [{ isDragging }, refDrag] = useDrag(() => ({
-    type: "text", // The type of item being dragged
+  const [{ isDragging }, drag] = useDrag({
+    type: "CARD",
     item: {
       card_id: cItem.card_id,
       card_name: cItem.card_name,
-      list_id: listId,
       index,
+      list_id: listId,
     },
     collect: (monitor) => ({
-      //  A function to collect rendering properties
-      isDragging: !!monitor.isDragging(),
+      isDragging: monitor.isDragging(),
     }),
-  }));
+  });
 
-  const opacity = isDragging ? 0 : 1;
+  const [, drop] = useDrop({
+    accept: "CARD",
+    canDrop: (item) => item.list_id === listId,
+    hover(item) {
+      if (item.card_id !== cItem.card_id && item.list_id === listId) {
+        moveCard(item.list_id, listId, item.index, index);
+        item.index = index;
+      } else if (item.card_id !== cItem.card_id && item.list_id !== listId) {
+        moveCard(item.list_id, listId, item.index, index);
+        item.list_id = listId;
+        item.index = index;
+      }
+    },
+  });
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-
-  const handleTextFieldClick = () => {
-    setOpen(true);
-  };
+  const opacity = isDragging ? 0.5 : 1;
 
   const handleClose = async (e) => {
     console.log("handleClose ", cItem, title);
-    // delete item.card_name;
 
     const { card_name, ...otherProps } = cItem;
     const newObj = { title: card_name, ...otherProps };
 
-    // console.log("handleClose item ", { ...newObj, title });
-
-    if (title) await editCard({ ...newObj, title }, listId);
-
+    if (title !== cItem.card_name) await editCard({ ...newObj, title }, listId);
     setOpen(false);
   };
 
-  refDrag(drop(ref));
   return (
     <>
       <div
         className="card-item-container"
-        ref={ref}
-        style={{ opacity, cursor: "move" }}
+        ref={(node) => drag(drop(node))}
+        style={{ opacity }}
       >
         {title && (
           <Card style={{ backgroundColor: "white", margin: "10px" }}>
@@ -103,15 +80,14 @@ export const CardsItem = ({ cItem, editCard, listId, moveItem, index }) => {
                   onChange={(e) => {
                     setTitle(e.target.value);
                   }}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
-                  onClick={handleTextFieldClick}
+                  onMouseEnter={(e) => setIsHovered(true)}
+                  onMouseLeave={(e) => setIsHovered(false)}
+                  onClick={(e) => setOpen(true)}
                 ></TextField>
                 {isHovered && <EditIcon onClose={handleClose}></EditIcon>}
-                <Dialog open={open} onClose={handleClose}>
+                <Dialog open={open}>
                   <DialogTitle>{title}</DialogTitle>
                   <DialogContent>
-                    {"Title"}
                     <TextField
                       value={title}
                       onChange={(e) => {

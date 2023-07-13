@@ -1,56 +1,73 @@
+export const findListById = (prevItems, pListId) => {
+  return prevItems.find((list) => list.list_id === pListId);
+};
+
+export const findCardById = (prevCards, pCardId) => {
+  return prevCards.find((card) => card.card_id === pCardId);
+};
+
+// update lists
+export const createCardUpdateList = (prevItems, listId, data) => {
+  findListById(prevItems, listId).cards.push(data.card);
+
+  console.log("createCardUpdateList mLists........", prevItems);
+  return prevItems;
+};
+
+// update lists
 export const editCardUpdateCardList = (prevItems, data, listId, cardItem) => {
+  // findListById(prevItems, listId).cards
+  // });
+
+  // console.log("prevItems  after........", prevItems);
+  // return prevItems;
+
   const mLists = prevItems.map((listElement) => {
     if (listElement.list_id === listId) {
       // list item
-      // const prevCardsArray = listElement.cards;
-      const newCards = listElement.cards.map((card) => {
+      const cards = listElement.cards.map((card) => {
         if (card.card_id === cardItem.card_id) {
           return { ...card, card_name: data.card.card_name };
         }
         return card;
       });
-      return { ...listElement, cards: [...newCards] };
-    }
-    return listElement;
-  });
-  console.log("newLists  after........", mLists);
-  return mLists;
-};
-
-// export const editCardUpdateCardList = (prevItems, listId, cardItem, data) => {
-//   const updatedList = [
-//     ...prevItems,
-//     prevItems
-//       .find((listElement) => listElement.list_id === listId)
-//       .cards.find((card) => {
-//         if (card.card_id === cardItem.card_id)
-//           return { ...card, card_name: data.card.card_name };
-//       }),
-//   ];
-//   console.log("updatedList>>>>>>>>>>>>", updatedList);
-// };
-
-export const createCardUpdateList = (copyList, listId, data) => {
-  const mLists = copyList.map((listElement) => {
-    if (listElement.list_id === listId) listElement.cards.push(data.card);
-    return listElement;
-  });
-
-  console.log("createCardUpdateList mLists........", mLists);
-  return mLists;
-};
-
-export const moveCardsInList = (prevItems, item, dragIndex, hoverIndex) => {
-  const mLists = prevItems.map((listElement) => {
-    if (listElement.list_id === item.list_id) {
-      const dragItem = listElement.cards[dragIndex];
-      const hoverItem = listElement.cards[hoverIndex];
-      listElement.cards[dragIndex] = hoverItem;
-      listElement.cards[hoverIndex] = dragItem;
-      return { ...listElement, cards: [...listElement.cards] };
+      return { ...listElement, cards: [...cards] };
     }
     return listElement;
   });
   console.log("mLists  after........", mLists);
   return mLists;
+};
+
+export const moveCardsLists = (
+  prevItems,
+  sourceListId,
+  targetListId,
+  sourceIndex,
+  targetIndex
+) => {
+  // // Find the source and target lists
+  const sourceListIndex = prevItems.indexOf(
+    findListById(prevItems, sourceListId)
+  );
+
+  const targetListIndex = prevItems.indexOf(
+    findListById(prevItems, targetListId)
+  );
+
+  // Move the card within the same list
+  if (sourceListId === targetListId) {
+    const cards = prevItems[sourceListIndex].cards;
+    const [movedCard] = cards.splice(sourceIndex, 1);
+    cards.splice(targetIndex, 0, movedCard);
+  } // Move the card between different lists
+  else {
+    const sourceCards = prevItems[sourceListIndex].cards;
+    const targetCards = prevItems[targetListIndex].cards;
+    const [movedCard] = sourceCards.splice(sourceIndex, 1);
+    targetCards.splice(targetIndex, 0, movedCard);
+  }
+
+  console.log("mLists  prevItems........", prevItems);
+  return prevItems;
 };

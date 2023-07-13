@@ -15,7 +15,7 @@ export const ListsItem = ({
   listId,
   createNewCard,
   editCard,
-  moveItem,
+  moveCard,
 }) => {
   // console.log("ListsItem list", { list });
 
@@ -67,7 +67,7 @@ export const ListsItem = ({
                   cards={list.cards}
                   editCard={editCard}
                   listId={listId}
-                  moveItem={moveItem}
+                  moveCard={moveCard}
                 />
               }
             </Typography>

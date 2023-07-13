@@ -22,14 +22,6 @@ export const Boards = () => {
   const [toggleBoardList, setToggleBoardList] = useState(false);
   const [boardItem, setBoardItem] = useState({});
 
-  // const [{ isOver }, refDrop] = useDrop(() => ({
-  //   accept: "text",
-  //   drop: (item) => addTextToBoard(item.card_id, item.listId),
-  //   collect: (monitor) => ({
-  //     isOver: !!monitor.isOver(),
-  //   }),
-  // }));
-
   useEffect(() => {
     populateBoards();
   }, []);
@@ -55,8 +47,8 @@ export const Boards = () => {
       const data = await createCard(item, listId);
       // Destructure the data array
       setLists((prevLists) => {
-        const copyList = [...prevLists];
-        return Util.createCardUpdateList(copyList, listId, data);
+        const prevItems = [...prevLists];
+        return Util.createCardUpdateList(prevItems, listId, data);
       });
     } catch (e) {
       console.log("Error: createNewCard ", e.message);
@@ -71,8 +63,6 @@ export const Boards = () => {
       // Destructure and update
       setLists((prevLists) => {
         const prevItems = [...prevLists];
-
-        // Util.editCardUpdateCardList(prevItems, listId, cardItem, "DND updated");
         return Util.editCardUpdateCardList(prevItems, data, listId, cardItem);
       });
     } catch (e) {
@@ -80,44 +70,25 @@ export const Boards = () => {
     }
   };
 
-  // Move card within a list
-  const moveItem = (dragIndex, hoverIndex, item) => {
+  const moveCard = (sourceListId, targetListId, sourceIndex, targetIndex) => {
     console.log(
-      "Boards moveItem : dragIndex, hoverIndex",
-      dragIndex,
-      hoverIndex,
-      item,
-      item.list_id
+      "moveCard sourceCardId: ",
+      sourceListId,
+      targetListId,
+      sourceIndex,
+      targetIndex
     );
-
     setLists((prevState) => {
       const prevItems = [...prevState];
-      return Util.moveCardsInList(prevItems, item, dragIndex, hoverIndex);
+      return Util.moveCardsLists(
+        prevItems,
+        sourceListId,
+        targetListId,
+        sourceIndex,
+        targetIndex
+      );
     });
   };
-
-  // const addTextToBoard = (card_id, listId) => {
-  //   console.log("addTextToBoard card card_id : ", listId, card_id);
-  //   setLists((prevLists) => {
-  //     const updatedList = [...prevLists];
-  //     const newUpdated = updatedList.map((listElement) => {
-  //       if (listElement.list_id === listId) {
-  //         // list item
-  //         // const prevCardsArray = listElement.cards;
-  //         const mCards = listElement.cards.map((card, index) => {
-  //           if (card.card_id === card_id) {
-  //             return { ...card, card_name: card.card_name };
-  //           }
-  //           return card;
-  //         });
-  //         return { ...listElement, cards: [...mCards] };
-  //       }
-  //       return listElement;
-  //     });
-  //     console.log("created newUpdated after........", newUpdated);
-  //     return newUpdated;
-  //   });
-  // };
 
   // item => list
   const createNewList = async (item) => {
@@ -175,7 +146,7 @@ export const Boards = () => {
               createNewCard={createNewCard}
               createNewList={createNewList}
               editCard={editCard}
-              moveItem={moveItem}
+              moveCard={moveCard}
             />
           )}
         </div>

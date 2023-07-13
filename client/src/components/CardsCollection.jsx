@@ -1,6 +1,7 @@
-import { CardsItem } from "./CardsItem";
+import { CardsItemAL } from "./CardsItemAL";
+// import { CardsItem } from "./CardsItem";
 
-export const CardsCollection = ({ cards, editCard, listId, moveItem }) => {
+export const CardsCollection = ({ cards, editCard, listId, moveCard }) => {
   // console.log("CardsCollection ", cards);
 
   return (
@@ -8,13 +9,14 @@ export const CardsCollection = ({ cards, editCard, listId, moveItem }) => {
       <div>
         {cards.map((item, index) => {
           return (
-            <CardsItem
+            <CardsItemAL
+              // <CardsItem
               key={item.card_id}
-              item={item}
+              cItem={item}
               editCard={editCard}
               listId={listId}
               index={index}
-              moveItem={moveItem}
+              moveCard={moveCard}
             />
           );
         })}
