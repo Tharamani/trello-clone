@@ -133,70 +133,7 @@ const getLists = async (req, res) => {
   }
 };
 
-const getCardsForEachListalt = async (req, res) => {
-  try {
-    const response = await getCardsForEachListModel(req.params.id);
-    console.log("getCardsForEachList  : response", response);
-
-    // get all list_id keys into an array
-    const uniqueListIds = response
-      .map((element) => {
-        return element.list_id;
-      })
-      .filter((value, index, array) => array.indexOf(value) === index);
-    console.log("uniqueListIds : ", uniqueListIds);
-
-    const result = {};
-    uniqueListIds.map((listIdKey) => {
-      console.log("listIdKey : ", listIdKey);
-
-      const cards = [];
-      response.map((resObj) => {
-        if (listIdKey === resObj.list_id) {
-          const card = {};
-          card["card_id"] = resObj.card_id;
-          card["card_name"] = resObj.card_name;
-          cards.push(card);
-        }
-      });
-
-      const lItem = response.filter((listItem) => {
-        if (listIdKey === listItem.list_id) {
-          return listItem;
-        }
-      });
-
-      console.log("listItem.list_name : ", lItem);
-
-      const listObj = {
-        list_name: lItem[0].list_name,
-        cards: cards,
-      };
-
-      result[listIdKey] = listObj;
-    });
-    console.log("result : ", result);
-
-    const listArray = [];
-    for (const key in result) {
-      const temp = {};
-      console.log("key", key);
-      console.log("value", result[key]);
-      const value = result[key];
-      temp[key] = value;
-      listArray.push(temp);
-    }
-
-    console.log("getCardsForEachList  : response", listArray);
-    return res.json(listArray); // 200 status is default
-  } catch (error) {
-    if (error.message === "Error retrieving list")
-      return res.status(404).json({ message: "Error retrieving list" });
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
-const getCardsForEachList = async (req, res) => {
+const getCardsForEachListALT = async (req, res) => {
   try {
     const response = await getCardsForEachListModel(req.params.id);
     console.log("getCardsForEachList  : response >>>>>>>>>>. ", response);
@@ -213,36 +150,43 @@ const getCardsForEachList = async (req, res) => {
         });
       } else {
         lists[lists.length - 1].cards.push(card);
-        // console.log("key : listLen", lists.length, listLen);
       }
       set.add(key);
       return lists;
     }, []);
 
-    // console.log("result", result);
-
-    // const set = new Set();
-    // const listsSet = response.reduce((lists, list) => {
-    //   let card = { card_id: list.card_id, card_name: list.card_name };
-    //   const key = `${list.list_id}${list.list_name}`;
-    //   // console.log("getCardsForEachList  : key", key);
-    //   // unique list ids
-
-    //   if (!set.has(key)) {
-    //     lists.push({
-    //       list_id: list.list_id,
-    //       list_name: list.list_name,
-    //       cards: list.card_id ? [card] : [],
-    //     });
-    //   } else {
-    //     lists[0].cards.push(card);
-    //   }
-    //   // console.log("getCardsForEachList  : key ", key);
-    //   set.add(key);
-
-    //   return lists;
-    // }, []);
     console.log("getCardsForEachList  : result", result);
+    return res.json(result); // 200 status is default
+  } catch (error) {
+    if (error.message === "Error retrieving list")
+      return res.status(404).json({ message: "Error retrieving list" });
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getCardsForEachList = async (req, res) => {
+  try {
+    const response = await getCardsForEachListModel(req.params.id);
+    console.log("getCardsForEachList  : response >>>>>>>>>>. ", response);
+
+    // Group cards by list_id
+    const result = response.reduce((acc, card) => {
+      const { list_id, list_name, card_id, card_name } = card;
+      const existingList = acc.find((list) => list.list_id === list_id);
+
+      if (existingList) {
+        existingList.cards.push(card_id ? { card_id, card_name } : []);
+      } else {
+        acc.push({
+          list_id,
+          list_name,
+          cards: card_id ? [{ card_id, card_name }] : [],
+        });
+      }
+      return acc;
+    }, []);
+
+    console.log("getCardsForEachList  : >>>>>>>>> result", result);
     return res.json(result); // 200 status is default
   } catch (error) {
     if (error.message === "Error retrieving list")
