@@ -5,10 +5,15 @@ import {
   Typography,
   CardContent,
   Button,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import "./ListsItem.css";
 import { CardsCollection } from "./CardsCollection";
+
+const options = ["Delete"];
 
 export const ListsItem = ({
   list,
@@ -16,6 +21,8 @@ export const ListsItem = ({
   createNewCard,
   editCard,
   moveCard,
+  removeCard,
+  removeList,
 }) => {
   // console.log("ListsItem list", { list });
 
@@ -24,8 +31,27 @@ export const ListsItem = ({
   const [closeCardState, setCloseCardState] = useState(false);
   const [newTitle, setNewTitle] = useState("");
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = async (event) => {
+    console.log("handleClick");
+    // await removeList(listId);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleDelete = async (event) => {
+    console.log("handleDelete");
+    await removeList(list);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const addCard = async (event) => {
-    event.preventDefault();
+    // event.preventDefault();
     const item = { title: newTitle };
 
     console.log("addCard ", item);
@@ -36,23 +62,24 @@ export const ListsItem = ({
     setToggleCard(!toggleCard);
   };
 
-  const closeCard = (event) => {
+  const closeCard = () => {
     setCloseCardState(!closeCardState);
   };
 
   return (
     <>
-      <div className="item-container">
-        <Card style={{ backgroundColor: "#B3AAA8", margin: "10px" }}>
+      <div className="list-cards">
+        <Card style={{ backgroundColor: "rgb(243, 238, 240)", margin: "10px" }}>
           <CardContent>
             <Typography
               variant="h5"
               component="div"
               style={{
-                backgroundColor: "#B3AAA8",
+                backgroundColor: "rgb(243, 238, 240)",
                 margin: "10px",
                 color: "black",
               }}
+              item
               className="TextField"
               value={title}
               onChange={(e) => {
@@ -60,6 +87,37 @@ export const ListsItem = ({
               }}
             >
               {title}
+
+              <MoreVertIcon
+                style={{
+                  position: "relative",
+                  top: "10px",
+                  left: "150px",
+                  bottom: "10px",
+                  padding: "3px",
+                }}
+                onClick={handleClick}
+              />
+
+              <Menu
+                id="long-menu"
+                MenuListProps={{
+                  "aria-labelledby": "long-button",
+                }}
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+              >
+                {options.map((option) => (
+                  <MenuItem
+                    key={option}
+                    selected={option === "Delete"}
+                    onClick={handleDelete}
+                  >
+                    {option}
+                  </MenuItem>
+                ))}
+              </Menu>
             </Typography>
             <Typography variant="h5" component="div">
               {
@@ -68,6 +126,8 @@ export const ListsItem = ({
                   editCard={editCard}
                   listId={listId}
                   moveCard={moveCard}
+                  list={list}
+                  removeCard={removeCard}
                 />
               }
             </Typography>
@@ -83,16 +143,14 @@ export const ListsItem = ({
               {toggleCard && <CloseIcon onClick={closeCard} />}
               {closeCardState && setToggleCard(false)}
               {closeCardState && setCloseCardState(false)}
-
               <Button
                 size="small"
                 color="primary"
                 style={{
-                  backgroundColor: "#B3AAA8",
+                  backgroundColor: "rgb(243, 238, 240)",
                   margin: "10px",
                   color: "#050505",
                 }}
-                type="button"
                 onClick={addCard}
               >
                 Add a Card

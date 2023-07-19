@@ -1,19 +1,42 @@
 import { useState, useRef } from "react";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
+// import { CloseIcon } from "@mui/icons-material";
+import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import {
   TextField,
   Card,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Box,
+  Modal,
+  Menu,
+  MenuItem,
+  CardContent,
+  Typography,
   Button,
 } from "@mui/material";
 import { useDrag, useDrop } from "react-dnd";
 
-export const CardsItem = ({ cItem, editCard, listId, moveItem, index }) => {
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 600,
+  height: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
+export const CardsItem = ({
+  cItem,
+  editCard,
+  listId,
+  index,
+  moveCard,
+  list,
+  removeCard,
+}) => {
   // console.log("CardsItem", item);
 
   const [title, setTitle] = useState(() => {
@@ -21,110 +44,192 @@ export const CardsItem = ({ cItem, editCard, listId, moveItem, index }) => {
     return cItem.card_name;
   });
   const [isHovered, setIsHovered] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [openOptions, setOpenOptions] = useState(false);
 
-  const ref = useRef(null);
-  const [, drop] = useDrop({
-    accept: "text",
-    hover(item, monitor) {
-      if (!ref.current) return;
-      const dragIndex = item.index;
-      const hoverIndex = index;
-      if (dragIndex === hoverIndex) return;
+  const [isEdited, setIsEdited] = useState(false);
 
-      // const hoverRect = ref.current.getBoundingClientRect();
-      // const hoverMiddleY = (hoverRect.bottom - hoverRect.top) / 2;
-      // const mousePosition = monitor.getClientOffset();
-      // const hoverClientY = mousePosition.y - hoverRect.top;
+  const handleClose = () => {
+    setOpenOptions(false);
+  };
 
-      // if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
-      // if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
-      moveItem(dragIndex, hoverIndex, item);
-      item.index = hoverIndex;
-    },
-  });
-  const [{ isDragging }, refDrag] = useDrag(() => ({
-    type: "text", // The type of item being dragged
+  const [{ isDragging }, drag] = useDrag({
+    type: "CARD",
     item: {
       card_id: cItem.card_id,
       card_name: cItem.card_name,
-      list_id: listId,
       index,
+      list_id: listId,
     },
     collect: (monitor) => ({
-      //  A function to collect rendering properties
-      isDragging: !!monitor.isDragging(),
+      isDragging: monitor.isDragging(),
     }),
-  }));
+  });
 
-  const opacity = isDragging ? 0 : 1;
+  const [, drop] = useDrop({
+    accept: "CARD",
+    canDrop: (item) => item.list_id === listId,
+    hover(item) {
+      if (item.card_id !== cItem.card_id && item.list_id === listId) {
+        moveCard(item.list_id, listId, item.index, index);
+        item.index = index;
+      } else if (item.card_id !== cItem.card_id && item.list_id !== listId) {
+        moveCard(item.list_id, listId, item.index, index);
+        item.list_id = listId;
+        item.index = index;
+      }
+    },
+  });
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
+  const opacity = isDragging ? 0.5 : 1;
 
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-
-  const handleTextFieldClick = () => {
-    setOpen(true);
-  };
-
-  const handleClose = async (e) => {
-    console.log("handleClose ", cItem, title);
-    // delete item.card_name;
+  const handleEdit = async (e) => {
+    console.log("handleEdit ", cItem, title);
 
     const { card_name, ...otherProps } = cItem;
     const newObj = { title: card_name, ...otherProps };
 
-    // console.log("handleClose item ", { ...newObj, title });
-
-    if (title) await editCard({ ...newObj, title }, listId);
-
-    setOpen(false);
+    if (title !== cItem.card_name) await editCard({ ...newObj, title }, listId);
+    setIsHovered(false);
+    setOpenOptions(false);
+    setIsEdited(false);
   };
 
-  refDrag(drop(ref));
+  const handleClick = async (e) => {
+    console.log("handleClick ", cItem, title);
+
+    // const { card_name, ...otherProps } = cItem;
+    // const newObj = { title: card_name, ...otherProps };
+
+    // if (title !== cItem.card_name) await editCard({ ...newObj, title }, listId);
+    // setOpenOptions(false);
+    // setIsHovered(false);
+    setOpenOptions(true);
+    setIsEdited(true);
+  };
+
+  const handleDelete = async (e) => {
+    console.log("handleDelete ");
+    await removeCard(cItem, listId);
+    // setOpenOptions(false);
+    setIsHovered(false);
+  };
   return (
     <>
       <div
-        className="card-item-container"
-        ref={ref}
-        style={{ opacity, cursor: "move" }}
+        className="card-item"
+        ref={(node) => drag(drop(node))}
+        style={{ opacity }}
+        // onMouseLeave={(e) => setOpenOptions(false)}
       >
         {title && (
           <Card style={{ backgroundColor: "white", margin: "10px" }}>
             <CardContent>
-              <Typography variant="h5" component="div">
-                <TextField
-                  className="TextField"
-                  value={title}
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                  }}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
-                  onClick={handleTextFieldClick}
-                ></TextField>
-                {isHovered && <EditIcon onClose={handleClose}></EditIcon>}
-                <Dialog open={open} onClose={handleClose}>
-                  <DialogTitle>{title}</DialogTitle>
-                  <DialogContent>
-                    {"Title"}
-                    <TextField
+              <Typography
+                variant="h5"
+                component="div"
+                onMouseEnter={(e) => setIsHovered(true)}
+                onMouseLeave={(e) => setIsHovered(false)}
+              >
+                {!isEdited && (
+                  <TextField
+                    className="TextField"
+                    value={title}
+                    onChange={(e) => {
+                      setTitle(e.target.value);
+                    }}
+                    onClick={(e) => {
+                      setOpenModal(true);
+                      setOpenEdit(true);
+                      // setOpenOptions(false);
+                      setIsHovered(false);
+                    }}
+                  ></TextField>
+                )}
+                {isHovered && (
+                  <EditIcon
+                    onClick={handleClick}
+                    onMouseLeave={(e) => setIsHovered(false)}
+                  ></EditIcon>
+                )}
+                {openOptions && (
+                  <Menu open={openOptions} onClose={handleClose}>
+                    <MenuItem onClick={handleDelete}>Delete</MenuItem>
+                  </Menu>
+                )}
+
+                {isEdited && (
+                  <Box
+                    component="form"
+                    sx={{
+                      "& .MuiTextField-root": { m: 1, width: "20ch" },
+                    }}
+                    noValidate
+                    autoComplete="off"
+                    onMouseLeave={(e) => setIsHovered(false)}
+                  >
+                    <textarea
+                      id="outlined-multiline-flexible"
+                      label="Multiline"
+                      multiline
+                      maxRows={4}
+                      data-autosize={true}
+                      dir="auto"
                       value={title}
                       onChange={(e) => {
                         setTitle(e.target.value);
                       }}
-                    />
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={handleClose} color="primary">
-                      Close
-                    </Button>
-                  </DialogActions>
-                </Dialog>
+                    ></textarea>
+                    <Button onClick={handleEdit}>Save</Button>
+                  </Box>
+                )}
+                {openModal && (
+                  <Modal
+                    open={openModal}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                  >
+                    <Box sx={style}>
+                      <Typography
+                        id="modal-modal-title"
+                        variant="h6"
+                        component="h2"
+                      >
+                        {title}
+                      </Typography>
+                      <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        is in {list.list_name}
+                      </Typography>
+                      <Typography
+                        id="modal-modal-title"
+                        variant="h6"
+                        component="h2"
+                        sx={{ mt: 4 }}
+                      >
+                        Description : {title}
+                      </Typography>
+
+                      <Typography
+                        id="modal-modal-title"
+                        variant="h6"
+                        component="h2"
+                        sx={{ mt: 4 }}
+                      >
+                        Activity
+                      </Typography>
+                      <CloseIcon
+                        style={{
+                          position: "absolute",
+                          top: "20px",
+                          right: "20px",
+                        }}
+                        onClick={(e) => setOpenModal(false)}
+                      >
+                        Close
+                      </CloseIcon>
+                    </Box>
+                  </Modal>
+                )}
               </Typography>
             </CardContent>
           </Card>

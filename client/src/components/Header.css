@@ -1,4 +1,5 @@
 .header {
-  text-align: center;
-  margin: 30px;
+  text-align: start;
+  background-color: rgb(172, 72, 114);
+  border: 2px solid rgb(116, 112, 112);
 }

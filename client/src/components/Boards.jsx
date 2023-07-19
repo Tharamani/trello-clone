@@ -1,6 +1,5 @@
 import { Collection } from "./Collection";
 import { useEffect, useState, useRef } from "react";
-import { useDrop } from "react-dnd";
 import {
   createBoard,
   getBoards,
@@ -8,6 +7,8 @@ import {
   createCard,
   createList,
   updateCard,
+  deleteCard,
+  deleteList,
 } from "../FetchRequest";
 import "./Boards.css";
 import { AddForm } from "./AddForm";
@@ -63,13 +64,40 @@ export const Boards = () => {
       // Destructure and update
       setLists((prevLists) => {
         const prevItems = [...prevLists];
-        return Util.editCardUpdateCardList(prevItems, data, listId, cardItem);
+        return Util.editCardUpdateList(prevItems, listId, data, cardItem);
       });
     } catch (e) {
       console.log("Error: editCard ", e.message);
     }
   };
 
+  const removeCard = async (cardItem, listId) => {
+    console.log("removeCard boards: card ", cardItem, listId);
+    try {
+      const data = await deleteCard(cardItem, listId);
+      // Destructure and update
+      setLists((prevLists) => {
+        const prevItems = [...prevLists];
+        return Util.deleteCardUpdateList(prevItems, listId, cardItem);
+      });
+    } catch (e) {
+      console.log("Error: editCard ", e.message);
+    }
+  };
+
+  const removeList = async (list) => {
+    console.log("removeList boards: ", list);
+    try {
+      const data = await deleteList(list);
+      // Destructure and update
+      setLists((prevLists) => {
+        const prevItems = [...prevLists];
+        return Util.deleteListUpdateList(prevItems, list);
+      });
+    } catch (e) {
+      console.log("Error: editCard ", e.message);
+    }
+  };
   const moveCard = (sourceListId, targetListId, sourceIndex, targetIndex) => {
     console.log(
       "moveCard sourceCardId: ",
@@ -80,7 +108,7 @@ export const Boards = () => {
     );
     setLists((prevState) => {
       const prevItems = [...prevState];
-      return Util.moveCardsLists(
+      return Util.moveCards(
         prevItems,
         sourceListId,
         targetListId,
@@ -122,13 +150,10 @@ export const Boards = () => {
 
   return (
     <>
-      <div className="board-container">
-        <div>
-          <h1>Your Board</h1>
-          <AddIcon className="sidebar" onClick={(e) => setToggle(!toggle)} />
-        </div>
-
-        <div>
+      <div className="boards">
+        <h1>Your Board</h1>
+        <div className="add-form">
+          <AddIcon onClick={(e) => setToggle(!toggle)} />
           {toggle && <AddForm addItem={addItem} setToggle={setToggle} />}
           <Collection
             props={boards}
@@ -137,20 +162,17 @@ export const Boards = () => {
           />
         </div>
       </div>
-
-      <div className="lists-container">
-        <div>
-          {toggleBoardList && (
-            <BoardLists
-              Lists={lists}
-              createNewCard={createNewCard}
-              createNewList={createNewList}
-              editCard={editCard}
-              moveCard={moveCard}
-            />
-          )}
-        </div>
-      </div>
+      {toggleBoardList && (
+        <BoardLists
+          Lists={lists}
+          createNewCard={createNewCard}
+          createNewList={createNewList}
+          editCard={editCard}
+          moveCard={moveCard}
+          removeCard={removeCard}
+          removeList={removeList}
+        />
+      )}
     </>
   );
 };

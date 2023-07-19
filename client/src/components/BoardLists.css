@@ -1,3 +1,9 @@
-.board-list {
-  padding-right: 100px;
+.lists-container {
+  display: flex;
+  flex-direction: row;
+  margin: 20px;
+  padding: 30px;
+}
+.add-list {
+  margin: 20px;
 }

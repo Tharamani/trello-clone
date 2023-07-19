@@ -1,30 +1,7 @@
-.board-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 70px;
-  /* border: 5px solid black; */
-}
-
-button {
-  width: 280px;
-}
-
-.sidebar {
-  padding-left: 230px;
-}
-
-/* .board-sidebar {
-  width: 600px;
-} */
-
-.lists-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  margin: 10px;
-  width: auto;
-}
-.add-list {
-  width: 400px;
+.boards {
+  background-color: rgb(172, 72, 114);
+  height: 1500px;
+  border: 2px solid rgb(116, 112, 112);
+  padding: 20px;
+  /* background-color: rgb(230, 118, 161); */
 }

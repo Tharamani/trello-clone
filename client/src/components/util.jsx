@@ -6,16 +6,14 @@ export const findCardById = (prevCards, pCardId) => {
   return prevCards.find((card) => card.card_id === pCardId);
 };
 
-// update lists
+// update lists after adding card
 export const createCardUpdateList = (prevItems, listId, data) => {
   findListById(prevItems, listId).cards.push(data.card);
-
-  console.log("createCardUpdateList mLists........", prevItems);
   return prevItems;
 };
 
-// update lists
-export const editCardUpdateCardList = (prevItems, data, listId, cardItem) => {
+// update lists, after editing card
+export const editCardUpdateList = (prevItems, listId, data, cardItem) => {
   // findListById(prevItems, listId).cards
   // });
 
@@ -35,11 +33,36 @@ export const editCardUpdateCardList = (prevItems, data, listId, cardItem) => {
     }
     return listElement;
   });
-  console.log("mLists  after........", mLists);
+  console.log("editCardUpdateCardList final mLists  ........", mLists);
   return mLists;
 };
 
-export const moveCardsLists = (
+export const deleteCardUpdateList = (prevItems, listId, cardItem) => {
+  const mLists = prevItems.map((listElement) => {
+    if (listElement.list_id === listId) {
+      // list item
+      const cards = listElement.cards.filter((card) => {
+        if (card.card_id !== cardItem.card_id) return true;
+      });
+      return { ...listElement, cards: [...cards] };
+    }
+    return listElement;
+  });
+
+  console.log("deleteCardUpdateCardList  final mLists ........", mLists);
+  return mLists;
+};
+
+export const deleteListUpdateList = (prevItems, list) => {
+  const mLists = prevItems.filter((listElement) => {
+    if (listElement.list_id !== list.list_id) return true;
+  });
+
+  console.log("deleteListUpdateCardList  final mLists ........", mLists);
+  return mLists;
+};
+
+export const moveCards = (
   prevItems,
   sourceListId,
   targetListId,

@@ -12,10 +12,9 @@ function App() {
           <div className="header">
             <Header />
           </div>
-          <div className="board-sidebar">
+          <div className="boards-containers">
             <Boards />
           </div>
-          {/* <div className="footer">Footer</div>  */}
         </div>
       </DndProvider>
     </>

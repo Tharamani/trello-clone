@@ -121,7 +121,6 @@ export const updateCard = async (item) => {
   console.log("fetchRequest... updateCard", item);
   if (item.title) {
     const response = await fetch(`${url}/cards/${item.card_id}`, {
-      // using list id create cards
       // api call
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -132,6 +131,46 @@ export const updateCard = async (item) => {
     }
     const data = await response.json();
     console.log("fetchRequest.. updateCard", data);
+
+    return data;
+  } else {
+    console.log("ERROR: Enter ");
+  }
+};
+
+export const deleteCard = async (item) => {
+  console.log("fetchRequest... deleteCard", item);
+  if (item.card_id) {
+    const response = await fetch(`${url}/cards/${item.card_id}`, {
+      // api call
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!response.ok) {
+      throw new Error("Error ", { cause: data.message });
+    }
+    const data = await response.json();
+    console.log("fetchRequest.. deleteCard", data);
+
+    return data;
+  } else {
+    console.log("ERROR: Enter ");
+  }
+};
+
+export const deleteList = async (item) => {
+  console.log("fetchRequest... deleteList", item);
+  if (item.list_id) {
+    const response = await fetch(`${url}/lists/${item.list_id}`, {
+      // api call
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!response.ok) {
+      throw new Error("Error ", { cause: data.message });
+    }
+    const data = await response.json();
+    console.log("fetchRequest.. deleteList", data);
 
     return data;
   } else {

@@ -1,9 +1,11 @@
 import "./Header.css";
+import logo from "../assets/applogo.png";
+
 export const Header = () => {
   return (
     <>
       <div className="header">
-        <h1>Trello-clone</h1>
+        <img src={logo} alt="logo" />
       </div>
     </>
   );
